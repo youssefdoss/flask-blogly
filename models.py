@@ -25,3 +25,5 @@ class User(db.Model):
     last_name = db.Column(db.Text,
         nullable=False)
     image_url = db.Column(db.Text) # maybe add a default image url and make it not null
+
+
