@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>{{ post.title }}</h1>
+
+<p>{{ post.content }}</p>
+
+<i>By {{ user.first_name }} {{ user.last_nam }}</i>
+
+<a href="/users/{{ user.id }}">Back to user page</a>
+<a href="/posts/{{ post.id }}/edit"></a>
+<button>Delete</button> <!--TODO: Figure out how to delete here-->
+
+{% endblock %}

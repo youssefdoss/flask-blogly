@@ -1,7 +1,7 @@
 """Blogly application."""
 
 from flask import Flask, request, redirect, render_template, flash
-from models import db, connect_db, User, DEFAULT_IMAGE_URL
+from models import db, connect_db, User, DEFAULT_IMAGE_URL, Post
 from sqlalchemy import delete
 
 app = Flask(__name__)
@@ -101,3 +101,73 @@ def delete_user(user_id):
     flash("User deleted")
 
     return redirect('/users')
+
+@app.get('/users/<int:user_id>/posts/new')
+def show_add_post_form(user_id):
+    '''Shows add post form for that user'''
+
+    user = User.query.get_or_404(user_id)
+    return render_template('new_post_form.html', user=user)
+
+@app.post('/users/<int:user_id>/posts/new')
+def add_post(user_id):
+    '''Handle add form; add post and redirect to the user detail page'''
+
+    title = request.form['title']
+    content = request.form['content']
+
+    post = Post(title = title, content=content, user_id=user_id)
+
+    db.session.add(post)
+    db.session.commit()
+
+    return redirect(f'/users/{user_id}')
+
+@app.get('/posts/<int:post_id>')
+def show_post(post_id):
+    '''Show a post. Show buttons to edit and delete that post'''
+
+    post = Post.query.get_or_404(post_id)
+    user = post.user
+
+    render_template('post_detail.html', post=post, user=user)
+
+@app.get('/posts/<int:post_id>/edit')
+def show_edit_form(post_id):
+    '''Show form to edit a post, and to cancel (back to user page)'''
+
+    post = Post.query.get_or_404(post_id)
+    user = post.user
+
+    render_template('edit_post.html', post=post, user=user)
+
+@app.post('/posts/<int:post_id>/edit')
+def edit_post(post_id):
+    '''Handle editing of a post. Redirect back to the post view'''
+
+    title = request.form['title']
+    content = request.form['content']
+
+    post = Post.query.get_or_404(post_id)
+
+    post.title = title
+    post.content = content
+
+    db.session.add(post)
+    db.session.commit()
+
+    return redirect(f'/posts/{post.id}')
+
+@app.post('/posts/<int:post_id>/delete')
+def delete_post(post_id):
+    '''Delete the post'''
+
+    post = Post.query.filter_by(id = post_id)
+    user_id = post.user.id
+    post.delete()
+
+    db.session.commit()
+
+    flash("Post Deleted")
+
+    return redirect(f'/users/{user_id}')
