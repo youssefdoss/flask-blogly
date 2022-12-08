@@ -1,7 +1,8 @@
 """Blogly application."""
 
 from flask import Flask, request, redirect, render_template
-from models import db, connect_db, User
+from models import db, connect_db, User, DEFAULT_IMAGE_URL
+from sqlalchemy import delete
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///blogly'
@@ -47,7 +48,7 @@ def add_user():
 
     first_name = request.form['first_name']
     last_name = request.form['last_name']
-    image_url = request.form['image_url']
+    image_url = request.form['image_url'] or None
 
     user = User(first_name = first_name, last_name = last_name, image_url = image_url)
 
@@ -66,7 +67,7 @@ def show_user(user_id):
 @app.get('/users/<int:user_id>/edit')
 def show_edit_user(user_id):
     '''Shows the edit page for a user'''
-    
+
     user = User.query.get_or_404(user_id)
     return render_template('edit_user.html', user=user)
 
@@ -76,7 +77,7 @@ def edit_user(user_id):
 
     first_name = request.form['first_name']
     last_name = request.form['last_name']
-    image_url = request.form['image_url']
+    image_url = request.form['image_url'] or DEFAULT_IMAGE_URL
 
     user = User.query.get_or_404(user_id)
 
@@ -93,8 +94,10 @@ def edit_user(user_id):
 def delete_user(user_id):
     '''Deletes the user'''
 
-    user = User.query.get_or_404(user_id)
-    
-    user.delete()
+    User.query.filter_by(id = user_id).delete()
+
+    db.session.commit()
+
+    # TODO: flash message
 
     return redirect('/users')

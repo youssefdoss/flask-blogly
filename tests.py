@@ -72,7 +72,7 @@ class UserViewTestCase(TestCase):
         with self.client as c:
             resp = c.get('/')
             self.assertEqual(resp.status_code, 302)
-            self.assertEqual(resp.location, '/users')
+            self.assertEqual(resp.location, '/users')   #TODO: delete this test and write new
 
     def test_show_add_users(self):
         with self.client as c:
@@ -83,17 +83,16 @@ class UserViewTestCase(TestCase):
 
     def test_add_user(self):
         with self.client as c:
-            test_user = User.query.get(self.user_id)
-            resp = c.post('/users/new', data=test_user, follow_redirects=True)
+            test_additional_user = dict(first_name = 'Jeff', last_name = 'Doe', image_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/640px-Image_created_with_a_mobile_phone.png')
+            resp = c.post('/users/new', data=test_additional_user, follow_redirects=True)
             html = resp.get_data(as_text=True)
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<button>Add user</button>', html)
 
     def test_show_user(self):
         with self.client as c:
-            test_user = User.query.get(self.user_id)
             resp = c.get(f'/users/{self.user_id}')
             html = resp.get_data(as_text=True)
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('<h1>test1_first', html)
+            self.assertIn('<p>test1_first', html)
 
