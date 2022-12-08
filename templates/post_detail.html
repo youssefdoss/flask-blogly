@@ -9,7 +9,10 @@
 <i>By {{ user.first_name }} {{ user.last_nam }}</i>
 
 <a href="/users/{{ user.id }}">Back to user page</a>
-<a href="/posts/{{ post.id }}/edit"></a>
-<button>Delete</button> <!--TODO: Figure out how to delete here-->
+<a href="/posts/{{ post.id }}/edit">Edit</a>
+
+<form action="/posts/{{post.id}}/delete" method="POST">
+<button>Delete</button>
+</form>
 
 {% endblock %}

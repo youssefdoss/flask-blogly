@@ -131,7 +131,7 @@ def show_post(post_id):
     post = Post.query.get_or_404(post_id)
     user = post.user
 
-    render_template('post_detail.html', post=post, user=user)
+    return render_template('post_detail.html', post=post, user=user)
 
 @app.get('/posts/<int:post_id>/edit')
 def show_edit_form(post_id):
@@ -140,7 +140,7 @@ def show_edit_form(post_id):
     post = Post.query.get_or_404(post_id)
     user = post.user
 
-    render_template('edit_post.html', post=post, user=user)
+    return render_template('edit_post.html', post=post, user=user)
 
 @app.post('/posts/<int:post_id>/edit')
 def edit_post(post_id):
@@ -163,12 +163,14 @@ def edit_post(post_id):
 def delete_post(post_id):
     '''Delete the post'''
 
-    post = Post.query.filter_by(id = post_id)
-    user_id = post.user.id
-    post.delete()
+    post = Post.query.filter_by(id = post_id).all()
+    user = post[0].user
+
+    db.session.delete(post[0])
+
 
     db.session.commit()
 
     flash("Post Deleted")
 
-    return redirect(f'/users/{user_id}')
+    return redirect(f'/users/{user.id}')
