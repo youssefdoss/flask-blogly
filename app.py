@@ -1,6 +1,6 @@
 """Blogly application."""
 
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, redirect, render_template, flash
 from models import db, connect_db, User, DEFAULT_IMAGE_URL
 from sqlalchemy import delete
 
@@ -98,6 +98,6 @@ def delete_user(user_id):
 
     db.session.commit()
 
-    # TODO: flash message
+    flash("User deleted")
 
     return redirect('/users')

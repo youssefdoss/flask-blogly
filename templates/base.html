@@ -7,7 +7,13 @@
     <title>Blogly</title>
 </head>
 <body>
+
+    {% for msg in get_flashed_messages() %}
+    <p>{{msg}}</p>
+    {% endfor %}
+
     {% block content %}
+
     {% endblock %}
 </body>
 </html>

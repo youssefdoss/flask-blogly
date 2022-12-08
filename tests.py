@@ -61,6 +61,7 @@ class UserViewTestCase(TestCase):
         db.session.rollback()
 
     def test_list_users(self):
+        '''Tests if returns html containing a list of users'''
         with self.client as c:
             resp = c.get("/users")
             self.assertEqual(resp.status_code, 200)
@@ -68,13 +69,16 @@ class UserViewTestCase(TestCase):
             self.assertIn("test1_first", html)
             self.assertIn("test1_last", html)
 
-    def test_redirect_to_users(self):
+    def test_show_edit_user(self):
+        '''Test when user clicks edit button, returns edit form html'''
         with self.client as c:
-            resp = c.get('/')
-            self.assertEqual(resp.status_code, 302)
-            self.assertEqual(resp.location, '/users')   #TODO: delete this test and write new
+            resp = c.get(f'/users/{self.user_id}/edit')
+            html = resp.get_data(as_text=True)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<h1>Edit a user', html)
 
     def test_show_add_users(self):
+        '''Tests if returns html to show add user form'''
         with self.client as c:
             resp = c.get('/users/new')
             html = resp.get_data(as_text=True)
@@ -82,6 +86,7 @@ class UserViewTestCase(TestCase):
             self.assertIn('<h1>Create a user</h1>', html)
 
     def test_add_user(self):
+        '''Tests if returns list of users after new user added'''
         with self.client as c:
             test_additional_user = dict(first_name = 'Jeff', last_name = 'Doe', image_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/640px-Image_created_with_a_mobile_phone.png')
             resp = c.post('/users/new', data=test_additional_user, follow_redirects=True)
@@ -90,6 +95,7 @@ class UserViewTestCase(TestCase):
             self.assertIn('<button>Add user</button>', html)
 
     def test_show_user(self):
+        '''Tests if returns html of a specific user clicked on'''
         with self.client as c:
             resp = c.get(f'/users/{self.user_id}')
             html = resp.get_data(as_text=True)
