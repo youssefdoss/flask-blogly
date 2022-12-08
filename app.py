@@ -95,7 +95,13 @@ def edit_user(user_id):
 def delete_user(user_id):
     '''Deletes the user'''
 
-    User.query.filter_by(id = user_id).delete()
+    user = User.query.filter_by(id = user_id).all()
+    posts = user[0].posts
+
+    for post in posts:
+        db.session.delete(post)
+        
+    db.session.delete(user[0])
 
     db.session.commit()
 

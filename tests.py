@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from app import app, db
-from models import DEFAULT_IMAGE_URL, User, connect_db
+from models import DEFAULT_IMAGE_URL, User, connect_db, Post
 
 # Let's configure our app to use a different database for tests
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql:///blogly_test"
@@ -31,6 +31,7 @@ class UserViewTestCase(TestCase):
         # As you add more models later in the exercise, you'll want to delete
         # all of their records before each test just as we're doing with the
         # User model below.
+        Post.query.delete()
         User.query.delete()
 
         self.client = app.test_client()
@@ -40,6 +41,7 @@ class UserViewTestCase(TestCase):
             last_name="test1_last",
             image_url=None,
         )
+
 
         second_user = User(
             first_name="test2_first",
@@ -55,6 +57,17 @@ class UserViewTestCase(TestCase):
         # rely on this user in our tests without needing to know the numeric
         # value of their id, since it will change each time our tests are run.
         self.user_id = test_user.id
+
+        test_post = Post(
+            title='test_title',
+            content='test_content',
+            user_id = self.user_id
+        )
+
+        db.session.add(test_post)
+        db.session.commit()
+
+        self.post_id = test_post.id
 
     def tearDown(self):
         """Clean up any fouled transaction."""
@@ -101,4 +114,38 @@ class UserViewTestCase(TestCase):
             html = resp.get_data(as_text=True)
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<p>test1_first', html)
+
+    def test_show_add_post_form(self):
+        '''Tests if it shows the correct add post form'''
+        with self.client as c:
+            resp = c.get(f'/users/{self.user_id}/posts/new')
+            html = resp.get_data(as_text=True)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<h1>Add Post for test1_first', html)
+
+    def test_add_post(self):
+        '''Tests if it adds the post correctly and brings back the user page'''
+        with self.client as c:
+            test_post = dict(title = 'test_title', content='test_content', user_id=self.user_id)
+            resp = c.post(f'/users/{self.user_id}/posts/new', data=test_post, follow_redirects=True)
+            html = resp.get_data(as_text=True)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<!--Testing add_post-->', html)
+
+    def test_show_post(self):
+        '''Tests if clicking on a post shows the post properly'''
+        with self.client as c:
+            resp = c.get(f'/posts/{self.post_id}')
+            html = resp.get_data(as_text=True)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<i>By test1_first', html)
+
+    def test_show_edit_form(self):
+        '''Tests if clicking on the edit button on a post shows the edit form properly'''
+        with self.client as c:
+            resp = c.get(f'/posts/{self.post_id}/edit')
+            html = resp.get_data(as_text=True)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<input type="text" name="title" value="test_title">', html)
+    
 
