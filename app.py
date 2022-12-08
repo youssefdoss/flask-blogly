@@ -62,7 +62,8 @@ def show_user(user_id):
     '''Show info on a single user'''
 
     user = User.query.get_or_404(user_id)
-    return render_template('user_info.html', user=user)
+    posts = user.posts
+    return render_template('user_info.html', user=user, posts = posts)
 
 @app.get('/users/<int:user_id>/edit')
 def show_edit_user(user_id):
