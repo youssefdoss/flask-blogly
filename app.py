@@ -95,12 +95,13 @@ def edit_user(user_id):
 def delete_user(user_id):
     '''Deletes the user'''
 
+    # Get or 404 instead
     user = User.query.filter_by(id = user_id).all()
     posts = user[0].posts
 
     for post in posts:
         db.session.delete(post)
-        
+
     db.session.delete(user[0])
 
     db.session.commit()
@@ -108,6 +109,8 @@ def delete_user(user_id):
     flash("User deleted")
 
     return redirect('/users')
+
+############################## posts routes ##################################
 
 @app.get('/users/<int:user_id>/posts/new')
 def show_add_post_form(user_id):
@@ -128,6 +131,8 @@ def add_post(user_id):
     db.session.add(post)
     db.session.commit()
 
+    # Add flash message about this (generally good when you redirect)
+
     return redirect(f'/users/{user_id}')
 
 @app.get('/posts/<int:post_id>')
@@ -136,6 +141,8 @@ def show_post(post_id):
 
     post = Post.query.get_or_404(post_id)
     user = post.user
+    # Could have also pulled out the user in the template (slight 
+    # preference for passing fewer things to the template)
 
     return render_template('post_detail.html', post=post, user=user)
 
@@ -163,17 +170,19 @@ def edit_post(post_id):
     db.session.add(post)
     db.session.commit()
 
+    # Flash plz
+
     return redirect(f'/posts/{post.id}')
 
 @app.post('/posts/<int:post_id>/delete')
 def delete_post(post_id):
     '''Delete the post'''
 
+    # Refactor like above delete
     post = Post.query.filter_by(id = post_id).all()
     user = post[0].user
 
     db.session.delete(post[0])
-
 
     db.session.commit()
 

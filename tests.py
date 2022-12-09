@@ -24,6 +24,8 @@ db.create_all()
 
 class UserViewTestCase(TestCase):
     """Test views for users."""
+    # Should've added a new test case
+    # When you make the new case, make sure that the tests are in similar order
 
     def setUp(self):
         """Create test client, add sample data."""
@@ -126,6 +128,7 @@ class UserViewTestCase(TestCase):
     def test_add_post(self):
         '''Tests if it adds the post correctly and brings back the user page'''
         with self.client as c:
+            # Try to write more vertically
             test_post = dict(title = 'test_title', content='test_content', user_id=self.user_id)
             resp = c.post(f'/users/{self.user_id}/posts/new', data=test_post, follow_redirects=True)
             html = resp.get_data(as_text=True)
@@ -146,6 +149,7 @@ class UserViewTestCase(TestCase):
             resp = c.get(f'/posts/{self.post_id}/edit')
             html = resp.get_data(as_text=True)
             self.assertEqual(resp.status_code, 200)
+            # Probably try to avoid using something like this so that additional attributes don't break it
             self.assertIn('<input type="text" name="title" value="test_title">', html)
     
 

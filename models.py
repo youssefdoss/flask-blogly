@@ -17,7 +17,7 @@ def connect_db(app):
 
 
 class User(db.Model):
-    '''User class'''
+    '''User class: Contains data about a user'''
 
     __tablename__ = 'users'
 
@@ -31,8 +31,10 @@ class User(db.Model):
     image_url = db.Column(db.Text,
         default=DEFAULT_IMAGE_URL)
 
+    # Check out the solution for some funkiness
+
 class Post(db.Model):
-    '''Post class'''
+    '''Post class: Contains data about each post'''
 
     __tablename__ = 'posts'
 
